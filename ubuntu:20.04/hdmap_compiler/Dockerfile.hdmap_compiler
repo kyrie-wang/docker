@@ -1,0 +1,70 @@
+FROM base:v1
+
+# Poco
+ENV POCO 1.11.1
+ENV POCO_URL https://github.com/pocoproject/poco/archive/refs/tags/poco-${POCO}-release.zip
+RUN cd software \
+    && apt-get update \
+    && apt-get install libssl-dev -y \
+    && wget "${POCO_URL}" -O poco-${POCO}.zip \
+    && unzip poco-${POCO}.zip \
+    && mkdir -p poco-poco-${POCO}-release/cmake-build \
+    && cd poco-poco-${POCO}-release/cmake-build \
+    && cmake .. \
+    && cmake --build . --config Release \
+    && cmake --build . --target install
+
+# For SpatiaLite
+RUN apt-get update \
+    && apt-get install libfreexl-dev librttopo-dev libxml2-dev libminizip-dev -y
+
+# GEOS
+ENV GEOS 3.10.1
+ENV GEOS_URL http://download.osgeo.org/geos/geos-${GEOS}.tar.bz2
+RUN cd software \
+    && wget "${GEOS_URL}" -O geos-${GEOS}.tar.bz2 \
+    && tar xjf geos-${GEOS}.tar.bz2 \
+    && cd geos-${GEOS} \
+    && ./configure \
+    && make -j8 \
+    && make install
+
+# Gdal
+ENV GDAL 3.4.1
+ENV GDAL_URL http://download.osgeo.org/gdal/${GDAL}/gdal-${GDAL}.tar.gz
+RUN cd software \
+    && wget "${GDAL_URL}" -O gdal-${GDAL}.tar.gz \
+    && tar xzf gdal-${GDAL}.tar.gz \
+    && cd gdal-${GDAL} \
+    && ./configure \
+    && make -j8 \
+    && make install
+
+# https://docs.djangoproject.com/zh-hans/3.2/ref/contrib/gis/install/spatialite/#spatialite-source
+# SpatiaLite
+ENV SPATIALITE 5.0.1
+ENV SPATIALITE_URL https://www.gaia-gis.it/gaia-sins/libspatialite-sources/libspatialite-${SPATIALITE}.tar.gz
+RUN cd software \
+    && wget "${SPATIALITE_URL}" -O spatialite-${SPATIALITE}.tar.gz \
+    && tar xzf spatialite-${SPATIALITE}.tar.gz \
+    && cd libspatialite-${SPATIALITE} \
+    && ./configure \
+    && make -j8 \
+    && make install
+
+# For pcl
+RUN apt-get update \
+    && apt-get install libflann-dev build-essential libgl1-mesa-dev libglu1-mesa-dev freeglut3-dev -y
+
+# PCL
+ENV PCL 1.12.1
+ENV PCL_URL https://github.com/PointCloudLibrary/pcl/archive/refs/tags/pcl-${PCL}.zip
+RUN cd software \
+    && wget "${PCL_URL}" -O pcl-${PCL}.zip \
+    && unzip pcl-${PCL}.zip \
+    && cd pcl-pcl-${PCL} \
+    && mkdir build \
+    && cd build \
+    && cmake -DCMAKE_BUILD_TYPE=Release .. \
+    && make -j8 \
+    && make install

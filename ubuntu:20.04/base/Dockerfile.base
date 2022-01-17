@@ -1,0 +1,129 @@
+FROM ubuntu:20.04
+
+ENV DEBIAN_FRONTEND noninteractive
+
+RUN apt-get update \
+    && apt-get install git-all autoconf automake libtool curl wget make cmake g++ unzip vim gdb sudo apt-utils -y
+
+# Git-lfs
+RUN curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh \
+    && apt-get update \
+    && apt-get install git-lfs -y
+
+# Protobuf
+ENV PROTOBUF 3.7.0
+ENV PROTOBUF_URL https://github.com/protocolbuffers/protobuf/releases/download/v${PROTOBUF}/protobuf-all-${PROTOBUF}.zip
+RUN apt-get update \
+    && rm -rf /var/lib/apt/lists/* \
+    && mkdir software \
+    && cd software \
+    && wget "${PROTOBUF_URL}" -O protobuf.zip \
+    && unzip protobuf.zip \
+    && cd protobuf* \
+    && ./autogen.sh \
+    && ./configure \
+    && make -j 8 \
+    && make install \
+    && ldconfig
+
+ENV GTEST 1.10.0
+ENV GTEST_URL https://github.com/google/googletest/archive/refs/tags/release-${GTEST}.zip
+RUN cd software \
+    && wget "${GTEST_URL}" -O gtest.zip \
+    && unzip gtest.zip \
+    && cd googletest* \
+    && cmake -DBUILD_SHARED_LIBS=ON . \
+    && make -j 8 \
+    && cp -rf googletest/include/gtest /usr/local/include \
+    && cp lib/* /usr/local/lib
+
+# Eigen
+ENV EIGEN 3.4.0
+ENV EIGEN_URL https://gitlab.com/libeigen/eigen/-/archive/${EIGEN}/eigen-${EIGEN}.zip
+RUN cd software \
+    && wget "${EIGEN_URL}" -O eigen-${EIGEN}.zip \
+    && unzip eigen-${EIGEN}.zip \
+    && mkdir -p eigen-${EIGEN}/build \
+    && cd eigen-${EIGEN}/build \
+    && cmake .. \
+    && make install 
+
+# glog gflag liblas
+RUN apt-get update \
+    && apt-get install libgflags-dev -y
+
+# Glog
+ENV GLOG 0.5.0
+ENV GLOG_URL https://github.com/google/glog/archive/refs/tags/v${GLOG}.zip
+RUN cd software \
+    && wget "${GLOG_URL}" -O glog-${GLOG}.zip \
+    && unzip glog-${GLOG}.zip \
+    && cd glog-${GLOG} \
+    && cmake -S . -B build -G "Unix Makefiles" \
+    && cmake --build build --target install
+
+# libboost
+RUN apt-get update \
+    && apt-get install libboost-all-dev -y
+
+# # Proj
+ENV SQLITE3 3370200
+ENV SQLITE3_URL https://www.sqlite.org/2022/sqlite-autoconf-${SQLITE3}.tar.gz
+RUN cd software \
+    && wget "${SQLITE3_URL}" -O sqlite-${SQLITE3}.tar.gz \
+    && tar xzf sqlite-${SQLITE3}.tar.gz \
+    && cd sqlite-autoconf-${SQLITE3} \
+    && ./configure \
+    && make -j8 \
+    && make install
+
+ENV TIFF 4.3.0
+ENV TIFF_URL http://download.osgeo.org/libtiff/tiff-${TIFF}.tar.gz
+RUN cd software \
+    && wget "${TIFF_URL}" -O tiff-${TIFF}.tar.gz \
+    && tar xzf tiff-${TIFF}.tar.gz \
+    && cd tiff-${TIFF} \
+    && ./configure \
+    && make -j8 \
+    && make install
+
+RUN apt-get update \
+    && apt-get install pkg-config libcurl4-openssl-dev -y
+
+ENV PROJ 8.2.1
+ENV PROJ_URL http://download.osgeo.org/proj/proj-${PROJ}.tar.gz
+# ENV PROJ_DATA 1.8
+# ENV PROJ_DATA_URL http://download.osgeo.org/proj/proj-data-${PROJ_DATA}.tar.gz
+RUN cd software\
+    && wget "${PROJ_URL}" -O proj-${PROJ}.tar.gz \
+    # && wget "${PROJ_DATA_URL}" -O proj-data-${PROJ_DATA}.tar.gz \
+    && tar xzf proj-${PROJ}.tar.gz \
+    && cd proj-${PROJ}/data \
+    # && tar xzf ../../proj-data-${PROJ_DATA}.tar.gz \
+    && cd .. \
+    && ./configure \
+    && make -j8 \
+    && make install
+
+ENV GEOTIFF 1.7.0
+ENV GEOTIFF_URL https://github.com/OSGeo/libgeotiff/releases/download/${GEOTIFF}/libgeotiff-${GEOTIFF}.tar.gz
+RUN cd software \
+    && wget "${GEOTIFF_URL}" -O libgeotiff-${GEOTIFF}.tar.gz \
+    && tar xzf libgeotiff-${GEOTIFF}.tar.gz \
+    && cd libgeotiff-${GEOTIFF} \
+    && ./configure \
+    && make -j8 \
+    && make install
+
+# # Liblas
+ENV LIBLAS 1.8.1
+ENV LIBLAS_URL https://github.com/libLAS/libLAS/archive/refs/tags/${LIBLAS}.zip
+RUN cd software \
+    && wget "${LIBLAS_URL}" -O liblas-${LIBLAS}.zip \
+    && unzip liblas-${LIBLAS}.zip \
+    && cd libLAS-${LIBLAS} \
+    && mkdir makefiles \
+    && cd makefiles \
+    && cmake -G "Unix Makefiles" ../ \
+    && make -j8 \
+    && make install
