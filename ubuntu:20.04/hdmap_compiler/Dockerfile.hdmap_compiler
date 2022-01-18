@@ -84,3 +84,16 @@ RUN mkdir software && cd software \
     && make -j8 \
     && make install \
     && cd /software/.. && rm -r software/
+
+# Clang 10 stable
+RUN wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -
+    && apt-get install clang-10 lldb-10 lld-10 -y \
+    && update-alternatives --install /usr/bin/clang clang /usr/bin/clang-10 1 --slave /usr/bin/clang++ clang++ /usr/bin/clang++-10
+    && update-alternatives --install /usr/bin/llc llc /usr/bin/llc-10 1
+
+# python 2
+# RUN apt-get install python2-minimal -y \
+#     && update-alternatives --install /usr/bin/python python /usr/bin/python2 1 \
+#     && update-alternatives --install /usr/bin/python python /usr/bin/python3 2 \
+#     && update-alternatives --config python \
+#     && 1
