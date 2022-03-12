@@ -3,7 +3,7 @@ FROM base:v1
 # Poco
 ENV POCO 1.11.1
 ENV POCO_URL https://github.com/pocoproject/poco/archive/refs/tags/poco-${POCO}-release.zip
-RUN cd software \
+RUN mkdir software && cd software \
     && apt-get update \
     && apt-get install libssl-dev -y \
     && wget "${POCO_URL}" -O poco-${POCO}.zip \
@@ -12,54 +12,55 @@ RUN cd software \
     && cd poco-poco-${POCO}-release/cmake-build \
     && cmake .. \
     && cmake --build . --config Release \
-    && cmake --build . --target install
-
-# For SpatiaLite
-RUN apt-get update \
-    && apt-get install libfreexl-dev librttopo-dev libxml2-dev libminizip-dev -y
+    && cmake --build . --target install \
+    && cd /software/.. && rm -r software/
 
 # GEOS
 ENV GEOS 3.10.1
 ENV GEOS_URL http://download.osgeo.org/geos/geos-${GEOS}.tar.bz2
-RUN cd software \
+RUN mkdir software && cd software \
+    # For SpatiaLite
+    && apt-get update \
+    && apt-get install libfreexl-dev librttopo-dev libxml2-dev libminizip-dev -y \
     && wget "${GEOS_URL}" -O geos-${GEOS}.tar.bz2 \
     && tar xjf geos-${GEOS}.tar.bz2 \
     && cd geos-${GEOS} \
     && ./configure \
     && make -j8 \
-    && make install
+    && make install \
+    && cd /software/.. && rm -r software/
 
 # Gdal
 ENV GDAL 3.4.1
 ENV GDAL_URL http://download.osgeo.org/gdal/${GDAL}/gdal-${GDAL}.tar.gz
-RUN cd software \
+RUN mkdir software && cd software \
     && wget "${GDAL_URL}" -O gdal-${GDAL}.tar.gz \
     && tar xzf gdal-${GDAL}.tar.gz \
     && cd gdal-${GDAL} \
     && ./configure \
     && make -j8 \
-    && make install
+    && make install \
+    && cd /software/.. && rm -r software/
 
 # https://docs.djangoproject.com/zh-hans/3.2/ref/contrib/gis/install/spatialite/#spatialite-source
 # SpatiaLite
 ENV SPATIALITE 5.0.1
 ENV SPATIALITE_URL https://www.gaia-gis.it/gaia-sins/libspatialite-sources/libspatialite-${SPATIALITE}.tar.gz
-RUN cd software \
+RUN mkdir software && cd software \
     && wget "${SPATIALITE_URL}" -O spatialite-${SPATIALITE}.tar.gz \
     && tar xzf spatialite-${SPATIALITE}.tar.gz \
     && cd libspatialite-${SPATIALITE} \
     && ./configure \
     && make -j8 \
-    && make install
-
-# For pcl
-RUN apt-get update \
-    && apt-get install libflann-dev build-essential libgl1-mesa-dev libglu1-mesa-dev freeglut3-dev -y
+    && make install \
+    && cd /software/.. && rm -r software/
 
 # PCL
 ENV PCL 1.12.1
 ENV PCL_URL https://github.com/PointCloudLibrary/pcl/archive/refs/tags/pcl-${PCL}.zip
-RUN cd software \
+RUN mkdir software && cd software \
+    && apt-get update \
+    && apt-get install libflann-dev build-essential libgl1-mesa-dev libglu1-mesa-dev freeglut3-dev -y \
     && wget "${PCL_URL}" -O pcl-${PCL}.zip \
     && unzip pcl-${PCL}.zip \
     && cd pcl-pcl-${PCL} \
@@ -67,4 +68,19 @@ RUN cd software \
     && cd build \
     && cmake -DCMAKE_BUILD_TYPE=Release .. \
     && make -j8 \
-    && make install
+    && make install \
+    && cd /software/.. && rm -r software/
+
+# OpenCV
+ENV OPENCV 4.5.5
+ENV OPENCV_URL https://github.com/opencv/opencv/archive/refs/tags/${OPENCV}.zip
+RUN mkdir software && cd software \
+    && wget "${OPENCV_URL}" -O opencv.zip \
+    && unzip opencv.zip \
+    && cd opencv-${4.5.5} \
+    && mkdir -p build && cd build \
+    && cmake -D CMAKE_BUILD_TYPE=RELEASE \
+             -D OPENCV_GENERATE_PKGCONFIG=ON .. \
+    && make -j8 \
+    && make install \
+    && cd /software/.. && rm -r software/
