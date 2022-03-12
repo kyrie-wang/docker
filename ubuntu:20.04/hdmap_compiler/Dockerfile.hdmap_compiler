@@ -75,12 +75,11 @@ RUN mkdir software && cd software \
 ENV OPENCV 4.5.5
 ENV OPENCV_URL https://github.com/opencv/opencv/archive/refs/tags/${OPENCV}.zip
 RUN mkdir software && cd software \
-    && wget "${OPENCV_URL}" -O opencv.zip \
-    && unzip opencv.zip \
-    && cd opencv-${4.5.5} \
-    && mkdir -p build && cd build \
-    && cmake -D CMAKE_BUILD_TYPE=RELEASE \
-             -D OPENCV_GENERATE_PKGCONFIG=ON .. \
+    && wget "${OPENCV_URL}" -O opencv-${OPENCV}.zip \
+    && unzip opencv-${OPENCV}.zip \
+    && cd opencv-${OPENCV} \
+    && mkdir build && cd build \
+    && cmake -D CMAKE_BUILD_TYPE=RELEASE .. \
     && make -j8 \
     && make install \
     && cd /software/.. && rm -r software/
