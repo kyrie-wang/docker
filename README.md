@@ -22,3 +22,8 @@
 ```
 docker build -t ${NAME}:${TAG} -f ubuntu\:20.04/base/Dockerfile.base .
 ```
+
+## Clear Docker cache
+```
+docker system prune --volumes
+```
