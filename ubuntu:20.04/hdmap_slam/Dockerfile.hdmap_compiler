@@ -1,0 +1,21 @@
+FROM hdmap_compiler:v1
+
+# GTSAM
+ENV GTSAM 4.1.1
+ENV GTSAM_URL https://github.com/borglab/gtsam/archive/refs/tags/${GTSAM}.zip
+RUN mkdir software && cd software \
+    && wget "${GTSAM_URL}" -O gtsam-${GTSAM}.zip \
+    && unzip gtsam-${GTSAM}.zip \
+    && cd gtsam-${GTSAM} \
+    && mkdir build && cd build \
+    && cmake -DGTSAM_BUILD_WITH_MARCH_NATIVE=OFF -DGTSAM_USE_SYSTEM_EIGEN=ON .. \
+    && make install \
+    && cd /software/.. && rm -r software/
+
+# ROS  Noetic
+RUN apt-get update \
+    &&  apt-get install lsb-core -y
+    && sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list' \
+    && curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add - \
+    && apt update \
+    && apt install ros-noetic-ros-base -y

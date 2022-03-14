@@ -2,6 +2,16 @@ FROM ubuntu:20.04
 
 ENV DEBIAN_FRONTEND noninteractive
 
+# python 3
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 1
+
+# python 2
+# RUN apt-get install python2 -y \
+#     && update-alternatives --install /usr/bin/python python /usr/bin/python2 1 \
+#     && update-alternatives --install /usr/bin/python python /usr/bin/python3 2 \
+#     && update-alternatives --config python \
+#     && 1
+
 # Git-lfs boost
 RUN apt-get update \
     && apt-get install git-all autoconf automake libtool curl wget make cmake g++ unzip vim gdb sudo apt-utils -y \
@@ -47,6 +57,7 @@ RUN mkdir software && cd software \
     && cd eigen-${EIGEN}/build \
     && cmake .. \
     && make install \
+    && ln -s /usr/local/include/eigen3/Eigen /usr/local/include/Eigen \
     && cd /software/.. && rm -r software/
 
 # Glog
