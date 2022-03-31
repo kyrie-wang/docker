@@ -2,6 +2,8 @@ FROM ubuntu:18.04
 
 ENV DEBIAN_FRONTEND noninteractive
 
+ADD ubuntu:18.04/base/sources.list /etc/apt/
+
 # Git-lfs boost
 RUN apt-get update \
     && apt-get install git-all autoconf automake libtool curl wget make cmake g++ unzip vim gdb sudo apt-utils libgflags-dev libgoogle-glog-dev -y \
@@ -116,23 +118,8 @@ RUN mkdir software && cd software \
     && cd /software/.. && rm -r software/
 
 
-# Poco
-ENV POCO 1.11.1
-ENV POCO_URL https://github.com/pocoproject/poco/archive/refs/tags/poco-${POCO}-release.zip
-RUN mkdir software && cd software \
-    && apt-get update \
-    && apt-get install libssl-dev -y \
-    && wget "${POCO_URL}" -O poco-${POCO}.zip \
-    && unzip poco-${POCO}.zip \
-    && mkdir -p poco-poco-${POCO}-release/cmake-build \
-    && cd poco-poco-${POCO}-release/cmake-build \
-    && cmake .. \
-    && cmake --build . --config Release \
-    && cmake --build . --target install \
-    && cd /software/.. && rm -r software/
-
 # GEOS
-ENV GEOS 3.10.1
+ENV GEOS 3.7.3
 ENV GEOS_URL http://download.osgeo.org/geos/geos-${GEOS}.tar.bz2
 RUN mkdir software && cd software \
     # For SpatiaLite
@@ -158,18 +145,6 @@ RUN mkdir software && cd software \
     && make install \
     && cd /software/.. && rm -r software/
 
-# https://docs.djangoproject.com/zh-hans/3.2/ref/contrib/gis/install/spatialite/#spatialite-source
-# SpatiaLite
-ENV SPATIALITE 5.0.1
-ENV SPATIALITE_URL https://www.gaia-gis.it/gaia-sins/libspatialite-sources/libspatialite-${SPATIALITE}.tar.gz
-RUN mkdir software && cd software \
-    && wget "${SPATIALITE_URL}" -O spatialite-${SPATIALITE}.tar.gz \
-    && tar xzf spatialite-${SPATIALITE}.tar.gz \
-    && cd libspatialite-${SPATIALITE} \
-    && ./configure \
-    && make -j8 \
-    && make install \
-    && cd /software/.. && rm -r software/
 
 # PCL
 ENV PCL 1.12.1
