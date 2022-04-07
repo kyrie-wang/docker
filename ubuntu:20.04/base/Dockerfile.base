@@ -2,6 +2,8 @@ FROM ubuntu:20.04
 
 ENV DEBIAN_FRONTEND noninteractive
 
+ADD ubuntu:20.04/base/sources.list /etc/apt/
+
 # Git-lfs boost
 RUN apt-get update \
     && apt-get install git-all autoconf automake libtool curl wget make cmake g++ unzip vim gdb sudo apt-utils -y \
