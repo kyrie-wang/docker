@@ -163,3 +163,16 @@ RUN mkdir software && cd software \
     && ln -s /usr/local/include/pcl-1.12/pcl /usr/local/include/pcl \
     && cd /software/.. && rm -r software/
 
+# OpenCV
+ENV OPENCV 4.5.5
+ENV OPENCV_URL https://github.com/opencv/opencv/archive/refs/tags/${OPENCV}.zip
+RUN mkdir software && cd software \
+    && wget "${OPENCV_URL}" -O opencv-${OPENCV}.zip \
+    && unzip opencv-${OPENCV}.zip \
+    && cd opencv-${OPENCV} \
+    && mkdir build && cd build \
+    && cmake -D CMAKE_BUILD_TYPE=RELEASE .. \
+    && make -j8 \
+    && make install \
+    && cd /software/.. && rm -r software/
+
