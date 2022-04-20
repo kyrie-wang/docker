@@ -83,6 +83,7 @@ RUN mkdir software && cd software \
     && cmake -D CMAKE_BUILD_TYPE=RELEASE .. \
     && make -j8 \
     && make install \
+    && ln -s /usr/local/include/opencv4/opencv2 /usr/local/include/opencv2 \
     && cd /software/.. && rm -r software/
 
 # Clang 10 stable
