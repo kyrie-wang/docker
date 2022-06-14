@@ -50,3 +50,5 @@ RUN mkdir software && cd software  && mkdir catkin_ws  && cd catkin_ws && mkdir 
     && apt install ros-noetic-pcl-msgs ros-noetic-tf -y \
     && /bin/bash -c '. /opt/ros/noetic/setup.bash; catkin_make install --cmake-args -DCMAKE_INSTALL_PREFIX=/opt/ros/noetic' \
     && cd /software/.. && rm -r software/
+
+RUN apt install libavcodec-dev libswscale-dev
